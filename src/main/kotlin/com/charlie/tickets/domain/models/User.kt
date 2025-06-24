@@ -20,8 +20,10 @@ data class User(
     @Id
     @Column(name = "id", updatable = false, nullable = false)
     val id: UUID,
+
     val name: String,
     val email: String,
+
     @OneToMany(mappedBy = "organizer", cascade = [CascadeType.ALL])
     val organizedEvents: List<Event> = emptyList(),
 
@@ -39,13 +41,13 @@ data class User(
         joinColumns = [JoinColumn(name = "user_id")],
         inverseJoinColumns = [JoinColumn(name = "event_id")]
     )
-    val stuffingEvents: List<Event> = emptyList(),
+    val staffingEvents: List<Event> = emptyList(),
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
-    val createdAt: LocalDateTime,
+    val createdAt: LocalDateTime = LocalDateTime.now(),
 
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
-    val updatedAt: LocalDateTime
+    val updatedAt: LocalDateTime = LocalDateTime.now()
 )
