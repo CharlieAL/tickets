@@ -1,17 +1,13 @@
 package com.charlie.tickets.domain.models
 
-import com.charlie.tickets.domain.EventStatusEnum
 import jakarta.persistence.CascadeType
 import jakarta.persistence.Column
 import jakarta.persistence.Entity
-import jakarta.persistence.EnumType
-import jakarta.persistence.Enumerated
 import jakarta.persistence.FetchType
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
 import jakarta.persistence.JoinColumn
-import jakarta.persistence.ManyToMany
 import jakarta.persistence.ManyToOne
 import jakarta.persistence.OneToMany
 import jakarta.persistence.Table
@@ -21,47 +17,28 @@ import java.time.LocalDateTime
 import java.util.UUID
 
 @Entity
-@Table(name = "events")
-data class Event(
+@Table(name = "ticket_types")
+data class TicketType(
     @Id
-    @Column(updatable = false, nullable = false)
+    @Column(nullable = false, updatable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID,
 
     @Column(nullable = false)
     val name: String,
 
-    @Column(name = "event_start")
-    val eventStart: LocalDateTime,
-
-    @Column(name = "event_end")
-    val eventEnd: LocalDateTime,
-
     @Column(nullable = false)
-    val venue: String,
-
-    @Column(name = "sales_start")
-    val salesStart: LocalDateTime,
-
-    @Column(name = "sales_end")
-    val salesEnd: LocalDateTime,
-
-    @Column(nullable = false)
-    @Enumerated(EnumType.STRING)
-    val status: EventStatusEnum,
+    val price: Double,
+    
+    @Column(name = "total_available")
+    val totalAvailable: Int,
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "organizer_id", nullable = false)
-    val organizer: User,
+    @JoinColumn(name = "event_id", nullable = false)
+    val event: Event,
 
-    @ManyToMany(mappedBy = "attendingEvents")
-    val attendees: List<User> = emptyList(),
-
-    @ManyToMany(mappedBy = "staffingEvents")
-    val staff: List<User> = emptyList(),
-
-    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
-    val ticketTypes: List<TicketType> = emptyList(),
+    @OneToMany(mappedBy = "ticketType", cascade = [CascadeType.ALL])
+    val tickets: List<Ticket> = emptyList(),
 
     @CreatedDate
     @Column(name = "created_at", updatable = false, nullable = false)
@@ -70,6 +47,4 @@ data class Event(
     @LastModifiedDate
     @Column(name = "updated_at", nullable = false)
     val updatedAt: LocalDateTime
-
-
 )
