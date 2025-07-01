@@ -1,4 +1,4 @@
-package com.charlie.tickets.domain.models
+package com.charlie.tickets.infrastructure.persistence.postgres.entity
 
 import com.charlie.tickets.domain.types.QrCodeStatusEnum
 import jakarta.persistence.Column
@@ -17,11 +17,30 @@ import org.springframework.data.annotation.LastModifiedDate
 import java.time.LocalDateTime
 import java.util.UUID
 
-data class QrCode(
+@Entity
+@Table(name = "qr_codes")
+data class QrCodeEntity(
+    @Id
+    @Column(updatable = false, nullable = false)
+    @GeneratedValue(strategy = GenerationType.UUID)
     val id: UUID,
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     val status: QrCodeStatusEnum,
+
+    @Column(nullable = false)
     val value: String,
-    val ticket: Ticket,
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "ticket_id")
+    val ticketEntity: TicketEntity,
+
+    @CreatedDate
+    @Column(name = "created_at", updatable = false, nullable = false)
     val createdAt: LocalDateTime,
+
+    @LastModifiedDate
+    @Column(name = "updated_at", nullable = false)
     val updatedAt: LocalDateTime
 )
