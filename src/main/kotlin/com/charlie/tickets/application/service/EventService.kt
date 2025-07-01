@@ -29,15 +29,19 @@ class EventService(
             salesEnd = eventCommand.salesEnd,
             status = eventCommand.status,
             organizer = user,
-            ticketTypes = eventCommand.ticketTypes.map {
-                TicketType(
-                    name = it.name,
-                    price = it.price,
-                    totalAvailable = it.totalAvailable,
-                    description = it.description,
-                )
-            },
         )
+
+        val ticketTypes = eventCommand.ticketTypes.map {
+            TicketType(
+                name = it.name,
+                price = it.price,
+                totalAvailable = it.totalAvailable,
+                description = it.description,
+                event = event
+            )
+        }.toMutableList()
+
+        event.ticketTypes = ticketTypes
 
 
         return eventRepository.save(event)

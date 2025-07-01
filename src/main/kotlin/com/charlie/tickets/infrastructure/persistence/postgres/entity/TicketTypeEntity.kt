@@ -38,7 +38,7 @@ data class TicketTypeEntity(
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "event_id")
-    val event: EventEntity? = null,
+    var event: EventEntity? = null,
 
     @OneToMany(mappedBy = "ticketTypeEntity", cascade = [CascadeType.ALL])
     val ticketEntities: List<TicketEntity> = emptyList(),

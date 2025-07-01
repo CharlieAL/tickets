@@ -40,10 +40,10 @@ class GlobalExceptionHandler {
     }
 
     // Manejo genérico para excepciones inesperadas
-//    @ExceptionHandler(Exception::class)
-//    fun handleGeneric(ex: Exception): ResponseEntity<ErrorResponse> {
-//        return ResponseEntity
-//            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-//            .body(ErrorResponse("INTERNAL_ERROR", ex.message ?: "Error inesperado"))
-//    }
+    @ExceptionHandler(Exception::class)
+    fun handleGeneric(ex: Exception): ResponseEntity<ErrorResponse> {
+        return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body(ErrorResponse("INTERNAL_ERROR", ex.message ?: "Error inesperado"))
+    }
 }
