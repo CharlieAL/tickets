@@ -13,17 +13,18 @@ fun EventEntity.toDomain(): Event {
         salesStart = this.salesStart,
         salesEnd = this.salesEnd,
         status = this.status,
-        createdAt = this.createdAt,
-        updatedAt = this.updatedAt,
         organizer = this.organizer.toDomain(),
-        attendees = this.attendees.map { it.toDomain() },
-        staff = this.staff.map { it.toDomain() },
-        ticketTypes = this.ticketTypeEntities.map { it.toDomain() }
+        attendees = emptyList(),
+        staff = emptyList(),
+        ticketTypes = this.ticketTypeEntities.map { it.toDomain() }.toMutableList(),
+        createdAt = this.createdAt,
+        updatedAt = this.updatedAt
     )
 }
 
 fun Event.toEntity(): EventEntity {
-    return EventEntity(
+    val eventEntity = EventEntity(
+        id = this.id,
         name = this.name,
         eventStart = this.eventStart,
         eventEnd = this.eventEnd,
@@ -31,11 +32,19 @@ fun Event.toEntity(): EventEntity {
         salesStart = this.salesStart,
         salesEnd = this.salesEnd,
         status = this.status,
+        organizer = this.organizer.toEntity(),
+        attendees = emptyList(),
+        staff = emptyList(),
         createdAt = this.createdAt,
         updatedAt = this.updatedAt,
-        organizer = this.organizer.toEntity(),
-        attendees = this.attendees.map { it.toEntity() },
-        staff = this.staff.map { it.toEntity() },
-        ticketTypeEntities = this.ticketTypes.map { it.toEntity() }
+        ticketTypeEntities = mutableListOf()
     )
+
+    val ticketTypes = this.ticketTypes.map {
+        it.toEntity(eventEntity)
+    }.toMutableList()
+
+    eventEntity.ticketTypeEntities = ticketTypes
+
+    return eventEntity
 }

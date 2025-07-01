@@ -3,9 +3,13 @@ package com.charlie.tickets.infrastructure.web.controllers
 import com.charlie.tickets.application.service.EventService
 import com.charlie.tickets.infrastructure.web.request.CreateEventRequest
 import com.charlie.tickets.infrastructure.web.response.CreateEventResponse
+import com.charlie.tickets.infrastructure.web.response.ListEventResponse
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
@@ -23,7 +27,7 @@ class EventController(
         return auth.principal as UUID
     }
 
-    @PostMapping()
+    @PostMapping
     fun create(
         @RequestBody request: CreateEventRequest
     ): ResponseEntity<CreateEventResponse> {
@@ -32,5 +36,15 @@ class EventController(
         val event = eventService.create(organizerId = userId, eventCommand = eventCommand)
         val response = CreateEventResponse.from(event)
         return ResponseEntity.status(HttpStatus.CREATED).body(response)
+    }
+
+    @GetMapping
+    fun listEvents(
+        pageable: Pageable
+    ): ResponseEntity<Page<ListEventResponse>> {
+        val userId = currentUserId()
+        val eventsPage = eventService.listEventsForOrganizer(organizerId = userId, pageable = pageable)
+        val responsePage = eventsPage.map { ListEventResponse.from(it) }
+        return ResponseEntity.ok(responsePage)
     }
 }

@@ -17,7 +17,7 @@ data class Event(
     val organizer: User,
     val attendees: List<User> = emptyList(),
     val staff: List<User> = emptyList(),
-    val ticketTypes: List<TicketType> = emptyList(),
+    var ticketTypes: MutableList<TicketType> = mutableListOf(),
     val createdAt: LocalDateTime = LocalDateTime.now(),
     val updatedAt: LocalDateTime = LocalDateTime.now()
 )

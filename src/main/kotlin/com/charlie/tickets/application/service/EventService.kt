@@ -7,6 +7,8 @@ import com.charlie.tickets.domain.models.command.CreateEventCommand
 import com.charlie.tickets.domain.ports.incoming.EventUseCase
 import com.charlie.tickets.domain.ports.outgoing.EventRepository
 import com.charlie.tickets.domain.ports.outgoing.UserRepository
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import java.util.UUID
 
@@ -29,17 +31,25 @@ class EventService(
             salesEnd = eventCommand.salesEnd,
             status = eventCommand.status,
             organizer = user,
-            ticketTypes = eventCommand.ticketTypes.map {
-                TicketType(
-                    name = it.name,
-                    price = it.price,
-                    totalAvailable = it.totalAvailable,
-                    description = it.description,
-                )
-            },
         )
+
+        val ticketTypes = eventCommand.ticketTypes.map {
+            TicketType(
+                name = it.name,
+                price = it.price,
+                totalAvailable = it.totalAvailable,
+                description = it.description,
+                event = event
+            )
+        }.toMutableList()
+
+        event.ticketTypes = ticketTypes
 
 
         return eventRepository.save(event)
+    }
+
+    override fun listEventsForOrganizer(organizerId: UUID, pageable: Pageable): Page<Event> {
+        return eventRepository.findByOrganizerId(organizerId, pageable)
     }
 }
