@@ -27,4 +27,17 @@ class EventRepositoryAdapter(
         return jpaEvent.findByOrganizerId(organizerId, pageable)
             .map { it.toDomain() } // Convert each EventEntity to Event domain model
     }
+
+    override fun findByIdAndOrganizerId(
+        eventId: UUID,
+        organizerId: UUID
+    ): Event? {
+        return jpaEvent.findByIdAndOrganizerId(eventId, organizerId)
+            ?.toDomain() // Convert EventEntity to Event domain model if found
+    }
+
+    override fun update(event: Event): Event {
+        val eventEntity = event.toEntity() // Convert Event domain model to EventEntity
+        return jpaEvent.save(eventEntity).toDomain() // Save and convert back to Event domain model
+    }
 }

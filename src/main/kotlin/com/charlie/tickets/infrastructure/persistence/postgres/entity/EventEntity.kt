@@ -61,7 +61,7 @@ data class EventEntity(
     @ManyToMany(mappedBy = "staffingEvents")
     val staff: List<UserEntity> = emptyList(),
 
-    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL])
+    @OneToMany(mappedBy = "event", cascade = [CascadeType.ALL], orphanRemoval = true)
     var ticketTypeEntities: MutableList<TicketTypeEntity> = mutableListOf(),
 
     @CreatedDate

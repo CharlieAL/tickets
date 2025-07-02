@@ -1,10 +1,13 @@
-package com.charlie.tickets.infrastructure.web.response
+package com.charlie.tickets.infrastructure.web.response.events
 
 import com.charlie.tickets.domain.models.Event
 import com.charlie.tickets.domain.types.EventStatusEnum
+import com.charlie.tickets.infrastructure.web.response.CreateTicketTypeResponse
 import java.time.LocalDateTime
+import java.util.UUID
 
-data class ListEventResponse(
+data class CreateEventResponse(
+    val id: UUID,
     val name: String,
     val eventStart: LocalDateTime,
     val eventEnd: LocalDateTime,
@@ -12,11 +15,13 @@ data class ListEventResponse(
     val salesStart: LocalDateTime,
     val salesEnd: LocalDateTime,
     val status: EventStatusEnum,
-    val ticketTypes: List<ListEventTicketTypeResponse> = emptyList()
+    val ticketTypes: List<CreateTicketTypeResponse>,
+    val createdAt: LocalDateTime,
 ) {
     companion object {
-        fun from(event: Event): ListEventResponse {
-            return ListEventResponse(
+        fun from(event: Event): CreateEventResponse {
+            return CreateEventResponse(
+                id = requireNotNull(event.id) { "Event ID cannot be null" },
                 name = event.name,
                 eventStart = event.eventStart,
                 eventEnd = event.eventEnd,
@@ -24,7 +29,8 @@ data class ListEventResponse(
                 salesStart = event.salesStart,
                 salesEnd = event.salesEnd,
                 status = event.status,
-                ticketTypes = event.ticketTypes.map { ListEventTicketTypeResponse.from(it) }
+                ticketTypes = event.ticketTypes.map { CreateTicketTypeResponse.Companion.from(it) },
+                createdAt = event.createdAt
             )
         }
     }

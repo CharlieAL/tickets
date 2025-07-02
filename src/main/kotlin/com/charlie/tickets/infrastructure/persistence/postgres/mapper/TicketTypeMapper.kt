@@ -3,7 +3,6 @@ package com.charlie.tickets.infrastructure.persistence.postgres.mapper
 import com.charlie.tickets.domain.models.TicketType
 import com.charlie.tickets.infrastructure.persistence.postgres.entity.EventEntity
 import com.charlie.tickets.infrastructure.persistence.postgres.entity.TicketTypeEntity
-import java.time.LocalDateTime
 
 // mappers
 fun TicketTypeEntity.toDomain(): TicketType {
