@@ -11,5 +11,4 @@ import java.util.UUID
 interface JpaEventRepository : JpaRepository<EventEntity, UUID> {
     fun findByOrganizerId(organizerId: UUID, pageable: Pageable): Page<EventEntity>
     fun findByIdAndOrganizerId(userId: UUID, organizerId: UUID): EventEntity?
-
 }

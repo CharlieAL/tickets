@@ -34,4 +34,8 @@ class RefreshTokenRepositoryAdapter(
         return saved.toDomainModel() // Convert the saved entity back to the domain model
     }
 
+    override fun deleteByUserId(userId: UUID) {
+        mongoRefreshTokenRepository.deleteByUserId(userId)
+    }
+
 }

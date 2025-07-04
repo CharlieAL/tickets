@@ -4,8 +4,10 @@ import com.charlie.tickets.domain.models.Event
 import com.charlie.tickets.domain.types.EventStatusEnum
 import com.charlie.tickets.infrastructure.web.response.TicketTypesResponse
 import java.time.LocalDateTime
+import java.util.UUID
 
 data class ListEventResponse(
+    val id: UUID,
     val name: String,
     val eventStart: LocalDateTime,
     val eventEnd: LocalDateTime,
@@ -18,6 +20,7 @@ data class ListEventResponse(
     companion object {
         fun from(event: Event): ListEventResponse {
             return ListEventResponse(
+                id = requireNotNull(event.id, { "Event (listEventResponse) ID cannot be null" }),
                 name = event.name,
                 eventStart = event.eventStart,
                 eventEnd = event.eventEnd,

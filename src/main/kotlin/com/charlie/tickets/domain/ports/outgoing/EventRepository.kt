@@ -10,4 +10,5 @@ interface EventRepository {
     fun findByOrganizerId(organizerId: UUID, pageable: Pageable): Page<Event>
     fun findByIdAndOrganizerId(eventId: UUID, organizerId: UUID): Event?
     fun update(event: Event): Event
+    fun delete(event: Event)
 }

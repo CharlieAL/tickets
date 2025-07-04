@@ -40,4 +40,11 @@ class EventRepositoryAdapter(
         val eventEntity = event.toEntity() // Convert Event domain model to EventEntity
         return jpaEvent.save(eventEntity).toDomain() // Save and convert back to Event domain model
     }
+
+    override fun delete(event: Event) {
+        val eventEntity = event.toEntity() // Convert Event domain model to EventEntity
+        jpaEvent.delete(eventEntity) // Delete the EventEntity
+    }
+
+
 }

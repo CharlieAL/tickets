@@ -10,4 +10,6 @@ interface RefreshTokenRepository {
     fun deleteByUserIdAndHashedToken(userId: UUID, hashedToken: String)
 
     fun save(refreshToken: RefreshToken): RefreshToken
+
+    fun deleteByUserId(userId: UUID)
 }

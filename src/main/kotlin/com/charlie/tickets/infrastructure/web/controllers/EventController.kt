@@ -14,6 +14,7 @@ import org.springframework.data.mongodb.repository.Update
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -57,6 +58,15 @@ class EventController(
         return ResponseEntity.ok(response)
     }
 
+    @DeleteMapping("/{eventId}")
+    fun delete(
+        @PathVariable eventId: UUID
+    ): ResponseEntity<Void> {
+        val userId = currentUserId()
+        eventService.deleteEventForOrganizer(organizerId = userId, eventId = eventId)
+        return ResponseEntity.noContent().build()
+    }
+
     @GetMapping
     fun listEvents(
         pageable: Pageable
@@ -73,6 +83,7 @@ class EventController(
     ): ResponseEntity<GetEventDetailsResponse> {
         val userId = currentUserId()
         val event = eventService.getEventForOrganizer(organizerId = userId, eventId = eventId)
+            ?: return ResponseEntity.notFound().build()
         val response = GetEventDetailsResponse.from(event)
         return ResponseEntity.ok(response)
     }

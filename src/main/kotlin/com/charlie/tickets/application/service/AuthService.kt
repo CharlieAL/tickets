@@ -27,14 +27,22 @@ class AuthService(
 ) : AuthUseCase {
     override fun login(email: String, password: String): TokenPair {
         val user = userRepository.findByEmail(email) ?: throw BadCredentialsException("Invalid credentials")
+
         if (!hashEncoder.matches(password, user.password)) {
             throw BadCredentialsException("Invalid credentials")
         }
 
-        println(user)
+        if (user.id == null) {
+            throw ResponseStatusException(HttpStatusCode.valueOf(500), "User ID is null")
+        }
 
-        val newAccessToken = jwtServiceImpl.generateAccessToken(user.id!!)
+
+        val newAccessToken = jwtServiceImpl.generateAccessToken(user.id)
         val newRefreshToken = jwtServiceImpl.generateRefreshToken(user.id)
+
+//        delete any existing refresh tokens for the user
+        refreshTokenRepository.deleteByUserId(user.id)
+
 
         storeRefreshToken(user.id, newRefreshToken)
 
@@ -45,7 +53,19 @@ class AuthService(
     }
 
     override fun logout(token: String): Boolean {
-        TODO("Not yet implemented")
+        val user = getUserFromToken(token)
+
+        if (user.id == null) {
+            throw ResponseStatusException(HttpStatusCode.valueOf(500), "User ID is null")
+        }
+
+        val hashed = hashToken(token)
+        refreshTokenRepository.findByUserIdAndHashedToken(user.id, hashed)
+            ?: throw ResponseStatusException(HttpStatusCode.valueOf(401), "Refresh token not recognized")
+
+        refreshTokenRepository.deleteByUserIdAndHashedToken(user.id, hashed)
+
+        return true
     }
 
     override fun register(name: String, email: String, password: String): User {
@@ -66,22 +86,20 @@ class AuthService(
 
     @Transactional
     override fun refreshToken(token: String): TokenPair {
-        if (!jwtServiceImpl.validateRefreshToken(token)) {
-            throw ResponseStatusException(HttpStatusCode.valueOf(401), "Invalid refresh token")
-        }
-        val userId = jwtServiceImpl.getUserIdFromToken(token)
+        val user = getUserFromToken(token)
 
-        val user = userRepository.findById(userId)
-            ?: throw ResponseStatusException(HttpStatusCode.valueOf(401), "User not found")
+        if (user.id == null) {
+            throw ResponseStatusException(HttpStatusCode.valueOf(500), "User ID is null")
+        }
 
         val hashed = hashToken(token)
-        refreshTokenRepository.findByUserIdAndHashedToken(user.id!!, hashed)
+        refreshTokenRepository.findByUserIdAndHashedToken(user.id, hashed)
             ?: throw ResponseStatusException(HttpStatusCode.valueOf(401), "Refresh token not recognized")
 
         refreshTokenRepository.deleteByUserIdAndHashedToken(user.id, hashed)
 
-        val newAccessToken = jwtServiceImpl.generateAccessToken(userId)
-        val newRefreshToken = jwtServiceImpl.generateRefreshToken(userId)
+        val newAccessToken = jwtServiceImpl.generateAccessToken(user.id)
+        val newRefreshToken = jwtServiceImpl.generateRefreshToken(user.id)
 
         storeRefreshToken(user.id, newRefreshToken)
 
@@ -109,5 +127,15 @@ class AuthService(
         val digest = MessageDigest.getInstance("SHA-256")
         val hashedBytes = digest.digest(token.encodeToByteArray())
         return Base64.getEncoder().encodeToString(hashedBytes)
+    }
+
+    private fun getUserFromToken(token: String): User {
+        if (!jwtServiceImpl.validateRefreshToken(token)) {
+            throw ResponseStatusException(HttpStatusCode.valueOf(401), "Invalid refresh token")
+        }
+        val userId = jwtServiceImpl.getUserIdFromToken(token)
+
+        return userRepository.findById(userId)
+            ?: throw ResponseStatusException(HttpStatusCode.valueOf(401), "User not found")
     }
 }

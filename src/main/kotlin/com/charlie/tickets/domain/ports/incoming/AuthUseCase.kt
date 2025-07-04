@@ -11,4 +11,5 @@ interface AuthUseCase {
     fun register(name: String, email: String, password: String): User
 
     fun refreshToken(token: String): TokenPair
+
 }

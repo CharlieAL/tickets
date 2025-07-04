@@ -13,6 +13,7 @@ import com.charlie.tickets.domain.ports.outgoing.UserRepository
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.time.LocalDateTime
 import java.util.UUID
 
@@ -57,19 +58,13 @@ class EventService(
         return eventRepository.findByOrganizerId(organizerId, pageable)
     }
 
-    override fun getEventForOrganizer(
-        organizerId: UUID,
-        eventId: UUID
-    ): Event {
+    override fun getEventForOrganizer(organizerId: UUID, eventId: UUID): Event {
         return eventRepository.findByIdAndOrganizerId(eventId, organizerId)
             ?: throw EventNotFoundException("Event with ID $eventId not found for organizer with ID $organizerId")
     }
 
-    override fun updateEventForOrganizer(
-        organizerId: UUID,
-        id: UUID,
-        eventCommand: UpdateEventCommand
-    ): Event {
+    @Transactional
+    override fun updateEventForOrganizer(organizerId: UUID, id: UUID, eventCommand: UpdateEventCommand): Event {
         if (eventCommand.id == null) {
             throw EventUpdateException("Event ID must be provided for update")
         }
@@ -78,7 +73,7 @@ class EventService(
         }
         val existingEvent = eventRepository.findByIdAndOrganizerId(id, organizerId)
             ?: throw EventNotFoundException("Event with ID $id not found for organizer with ID $organizerId")
-        
+
 
         val updateTicketTypes = eventCommand.ticketTypes.map {
             val ticketType = it.id?.let { existingId ->
@@ -112,5 +107,13 @@ class EventService(
             updatedAt = LocalDateTime.now()
         )
         return eventRepository.update(updatedEvent)
+    }
+
+    @Transactional
+    override fun deleteEventForOrganizer(organizerId: UUID, eventId: UUID) {
+        getEventForOrganizer(
+            organizerId = organizerId,
+            eventId = eventId
+        ).let { eventRepository.delete(it) }
     }
 }

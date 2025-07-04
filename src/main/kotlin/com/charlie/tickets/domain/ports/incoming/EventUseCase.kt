@@ -12,4 +12,5 @@ interface EventUseCase {
     fun listEventsForOrganizer(organizerId: UUID, pageable: Pageable): Page<Event>
     fun getEventForOrganizer(organizerId: UUID, eventId: UUID): Event?
     fun updateEventForOrganizer(organizerId: UUID, id: UUID, eventCommand: UpdateEventCommand): Event
+    fun deleteEventForOrganizer(organizerId: UUID, eventId: UUID)
 }

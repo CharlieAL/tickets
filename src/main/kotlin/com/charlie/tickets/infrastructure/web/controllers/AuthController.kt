@@ -64,4 +64,13 @@ class AuthController(
         )
     }
 
+    @PostMapping("/logout")
+    fun logout(
+        @RequestBody body: RefreshRequest
+    ): Boolean {
+        return authService.logout(
+            token = body.refreshToken
+        )
+    }
+
 }

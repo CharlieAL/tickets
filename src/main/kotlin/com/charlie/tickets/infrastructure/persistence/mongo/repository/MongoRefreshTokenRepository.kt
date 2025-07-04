@@ -9,4 +9,6 @@ interface MongoRefreshTokenRepository : MongoRepository<RefreshTokenDocument, Ob
     fun findByUserIdAndHashedToken(userId: UUID, hashedToken: String): RefreshTokenDocument?
 
     fun deleteByUserIdAndHashedToken(userId: UUID, hashedToken: String)
+
+    fun deleteByUserId(userId: UUID)
 }
